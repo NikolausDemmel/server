@@ -4,21 +4,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { Configuration } from 'webpack'
-
-import webpackPreprocessor from '@cypress/webpack-preprocessor'
+import vitePreprocessor from 'cypress-vite'
+import { configureNextcloud, startNextcloud, stopNextcloud, waitOnNextcloud } from '@nextcloud/e2e-test-server'
 import { defineConfig } from 'cypress'
 import { removeDirectory } from 'cypress-delete-downloads-folder'
 import cypressSplit from 'cypress-split'
-import { join } from 'path'
-import {
-	applyChangesToNextcloud,
-	configureNextcloud,
-	startNextcloud,
-	stopNextcloud,
-	waitOnNextcloud,
-} from './cypress/dockerNode.ts'
-import webpackConfig from './webpack.config.js'
+import { existsSync } from 'fs'
+import { join, resolve } from 'path'
 
 export default defineConfig({
 	projectId: '37xpdh',
@@ -65,13 +57,13 @@ export default defineConfig({
 		// We've imported your old cypress plugins here.
 		// You may want to clean this up later by importing these.
 		async setupNodeEvents(on, config) {
-			on('file:preprocessor', webpackPreprocessor({ webpackOptions: webpackConfig as Configuration }))
+			on('file:preprocessor', vitePreprocessor())
 
 			on('task', { removeDirectory })
 
 			// This allows to store global data (e.g. the name of a snapshot)
 			// because Cypress.env() and other options are local to the current spec file.
-			const data = {}
+			const data: Record<string, unknown> = {}
 			on('task', {
 				setVariable({ key, value }) {
 					data[key] = value
@@ -117,18 +109,42 @@ export default defineConfig({
 				cypressSplit(on, config)
 			}
 
+			const mounts = {
+				'3rdparty': resolve(__dirname, './3rdparty'),
+				apps: resolve(__dirname, './apps'),
+				core: resolve(__dirname, './core'),
+				dist: resolve(__dirname, './dist'),
+				lib: resolve(__dirname, './lib'),
+				ocs: resolve(__dirname, './ocs'),
+				'ocs-provider': resolve(__dirname, './ocs-provider'),
+				resources: resolve(__dirname, './resources'),
+				tests: resolve(__dirname, './tests'),
+				'console.php': resolve(__dirname, './console.php'),
+				'cron.php': resolve(__dirname, './cron.php'),
+				'index.php': resolve(__dirname, './index.php'),
+				occ: resolve(__dirname, './occ'),
+				'public.php': resolve(__dirname, './public.php'),
+				'remote.php': resolve(__dirname, './remote.php'),
+				'status.php': resolve(__dirname, './status.php'),
+				'version.php': resolve(__dirname, './version.php'),
+			} as Record<string, string>
+
+			for (const [key, path] of Object.entries(mounts)) {
+				if (!existsSync(path)) {
+					delete mounts[key]
+				}
+			}
+
 			// Before the browser launches
 			// starting Nextcloud testing container
-			const ip = await startNextcloud(process.env.BRANCH)
+			const ip = await startNextcloud(process.env.BRANCH, false, {
+				mounts,
+			})
 
 			// Setting container's IP as base Url
 			config.baseUrl = `http://${ip}/index.php`
 			await waitOnNextcloud(ip)
 			await configureNextcloud()
-
-			if (!process.env.CI) {
-				await applyChangesToNextcloud()
-			}
 
 			// IMPORTANT: return the config otherwise cypress-split will not work
 			return config

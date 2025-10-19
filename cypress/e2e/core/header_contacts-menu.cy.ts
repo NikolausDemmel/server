@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { User } from '@nextcloud/cypress'
-import randomString from 'crypto-random-string'
+import { User } from '@nextcloud/e2e-test-server/cypress'
 import { clearState, getNextcloudHeader } from '../../support/commonUtils.ts'
 
 const admin = new User('admin', 'admin')
@@ -44,7 +43,7 @@ describe('Header: Contacts menu', { testIsolation: true }, () => {
 
 	it('Just added users are seen in the contacts menu', () => {
 		// I create a new user
-		const newUserName = randomString(7)
+		const newUserName = (Math.random() + 1).toString(36).substring(7)
 		// we can not use createRandomUser as it will invalidate the session
 		cy.runOccCommand(`user:add --password-from-env '${newUserName}'`, { env: { OC_PASS: '1234567' } })
 		// I open the Contacts menu

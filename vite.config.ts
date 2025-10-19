@@ -3,6 +3,5 @@
  * SPDX-License-Identifier: CC0-1.0
  */
 
-import { createAppConfig } from '@nextcloud/vite-config'
-
-export default createAppConfig({})
+// temporary placeholder, see build/frontend/vite.config.ts
+export default {}

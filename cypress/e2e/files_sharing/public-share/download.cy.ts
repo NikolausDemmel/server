@@ -1,4 +1,4 @@
-import type { User } from '@nextcloud/cypress'
+import type { User } from '@nextcloud/e2e-test-server/cypress'
 
 /*!
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors

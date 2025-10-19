@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { basename } from 'path'
+import { basename } from '@nextcloud/paths'
 
 /**
  * Get the header navigation bar
