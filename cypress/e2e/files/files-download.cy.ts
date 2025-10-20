@@ -7,6 +7,7 @@ import type { User } from '@nextcloud/e2e-test-server/cypress'
 
 import { deleteDownloadsFolderBeforeEach } from 'cypress-delete-downloads-folder'
 import { zipFileContains } from '../../support/utils/assertions.ts'
+import { randomString } from '../../support/utils/randomString.ts'
 import { getRowForFile, navigateToFolder, triggerActionForFile } from './FilesUtils.ts'
 
 describe('files: Download files using file actions', { testIsolation: true }, () => {
@@ -303,7 +304,6 @@ describe('files: Download files using selection', () => {
 	 * Regression test of https://help.nextcloud.com/t/unable-to-download-files-on-nextcloud-when-multiple-files-selected/221327/5
 	 */
 	it('can download selected files with email uid', () => {
-		const randomString = (length: number) => (Math.random() + 1).toString(36).substring(length)
 		const name = `${randomString(5)}@${randomString(3)}`
 		const user: User = { userId: name, password: name, language: 'en' }
 

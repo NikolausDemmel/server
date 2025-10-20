@@ -146,12 +146,14 @@ export default defineConfig({
 
 			// Before the browser launches
 			// starting Nextcloud testing container
+			const port = 8042
 			const ip = await startNextcloud(process.env.BRANCH, false, {
 				mounts,
+				exposePort: port,
 			})
 
 			// Setting container's IP as base Url
-			config.baseUrl = `http://${ip}/index.php`
+			config.baseUrl = `http://localhost:${port}/index.php`
 			await waitOnNextcloud(ip)
 			await configureNextcloud()
 

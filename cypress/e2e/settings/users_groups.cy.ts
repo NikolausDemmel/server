@@ -4,7 +4,7 @@
  */
 
 import { User } from '@nextcloud/e2e-test-server/cypress'
-import randomString from 'crypto-random-string'
+import { randomString } from '../../support/utils/randomString.ts'
 import { assertNotExistOrNotVisible, getUserListRow, handlePasswordConfirmation, toggleEditButton } from './usersUtils.ts'
 
 const admin = new User('admin', 'admin')

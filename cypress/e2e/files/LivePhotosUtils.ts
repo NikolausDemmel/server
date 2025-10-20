@@ -5,6 +5,8 @@
 
 import type { User } from '@nextcloud/e2e-test-server/cypress'
 
+import { randomString } from '../../support/utils/randomString.ts'
+
 type SetupInfo = {
 	snapshot: string
 	jpgFileId: number
@@ -72,7 +74,7 @@ export function setupLivePhotos(): Cypress.Chainable<SetupInfo> {
 			} else {
 				let requesttoken: string
 
-				setupInfo.fileName = Math.random().toString(36).replace(/[^a-z]+/g, '').substring(0, 10)
+				setupInfo.fileName = randomString(10)
 
 				cy.createRandomUser().then((_user) => {
 					setupInfo.user = _user
