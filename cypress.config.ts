@@ -4,13 +4,20 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import vitePreprocessor from 'cypress-vite'
 import { configureNextcloud, startNextcloud, stopNextcloud, waitOnNextcloud } from '@nextcloud/e2e-test-server'
 import { defineConfig } from 'cypress'
 import { removeDirectory } from 'cypress-delete-downloads-folder'
 import cypressSplit from 'cypress-split'
-import { existsSync } from 'fs'
-import { join, resolve } from 'path'
+import vitePreprocessor from 'cypress-vite'
+import { existsSync } from 'node:fs'
+import { join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
+
+if (!globalThis.__dirname) {
+	// Cypress has their own weird parser
+	globalThis.__dirname = fileURLToPath(new URL(import.meta.url))
+}
 
 export default defineConfig({
 	projectId: '37xpdh',
@@ -57,7 +64,9 @@ export default defineConfig({
 		// We've imported your old cypress plugins here.
 		// You may want to clean this up later by importing these.
 		async setupNodeEvents(on, config) {
-			on('file:preprocessor', vitePreprocessor())
+			on('file:preprocessor', vitePreprocessor({
+				plugins: [nodePolyfills()],
+			}))
 
 			on('task', { removeDirectory })
 
